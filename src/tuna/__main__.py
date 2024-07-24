@@ -7,6 +7,7 @@ from tuna.config import STRATUM_PASSWORD
 from tuna.config import STRATUM_PORT
 from tuna.datums import StateV2
 from tuna.datums import TargetState
+from tuna.gpu_library import mine_cuda
 from tuna.utils import latest_block
 from tuna.utils import get_hash
 from tuna.stratum import Stratum
@@ -45,6 +46,9 @@ with connection as conn:
                     logger.info(
                         f"New job: {conn.job_id}, ({hash_count/(10 ** 6 * (time.time() - start)):0.3f} Mh/s, submissions={submit_count}, time={time.time() - start:0.3f}s),"
                     )
+                    logger.info(
+                        f"Difficulty: {conn.difficulty}),"
+                    )
                     submit_count = 0
                     hash_count = 0
                     start = time.time()
@@ -69,35 +73,46 @@ with connection as conn:
         target_bytes = bytearray(conn.target.to_cbor())
         target_view = memoryview(target_bytes)
 
-        hsh = get_hash(target_bytes)
-
         window = slice(
             4 + len(conn.extra_nonce_1),
             4 + len(conn.extra_nonce_1) + len(conn.extra_nonce_2),
         )
         nonce_size = len(conn.extra_nonce_2)
-        while not all(["0" == h for h in hsh.hex()[: conn.difficulty]]):
-            try:
-                target_view[window] = (
-                    int.from_bytes(target_view[window]) + 1
-                ).to_bytes(nonce_size)
-            except OverflowError:
-                print(target.nonce)
-                raise
-            hsh = get_hash(target_bytes)
-            hash_count += 1
+        
+        # hsh = get_hash(target_bytes)
+        # while not all(["0" == h for h in hsh.hex()[: conn.difficulty]]):
+        #     try:
+        #         target_view[window] = (
+        #             int.from_bytes(target_view[window]) + 1
+        #         ).to_bytes(nonce_size)
+        #     except OverflowError:
+        #         print(target.nonce)
+        #         raise
+        #     hsh = get_hash(target_bytes)
+        #     hash_count += 1
+
+        # logger.debug(f"Submitting nonce: {target_view[window].hex()}, hash={hsh.hex()}")
+        # conn.submit_nonce(target_view[window].hex())
+        # submit_count += 1
+
+        # target_view[window] = (int.from_bytes(target_view[window]) + 1).to_bytes(
+        #     nonce_size
+        # )
+        # conn.target = TargetState.from_cbor(target_bytes)
+        
+        nonces = mine_cuda(conn.target.to_cbor(), 8)
 
         if job_id != conn.job_id:
             continue
 
-        logger.debug(f"Submitting nonce: {target_view[window].hex()}, hash={hsh.hex()}")
-        conn.submit_nonce(target_view[window].hex())
-        submit_count += 1
-
-        target_view[window] = (int.from_bytes(target_view[window]) + 1).to_bytes(
-            nonce_size
-        )
-        conn.target = TargetState.from_cbor(target_bytes)
+        for nonce in nonces:
+            target_view[window] = (
+                int.from_bytes(bytes.fromhex(nonce[8:]))
+            ).to_bytes(nonce_size)
+            hsh = get_hash(target_bytes)
+            logger.info(f"Submitting nonce: {target_view[window].hex()}, hash={hsh.hex()}")
+            conn.submit_nonce(target_view[window].hex())
+            submit_count += 1
 
 # while True:
 #     start = time.time()

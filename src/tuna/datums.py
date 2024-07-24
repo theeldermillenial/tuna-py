@@ -11,11 +11,11 @@ class TargetState(PlutusData):
 
     nonce: bytes
     miner: bytes
-    epoch_time: int
     block_number: int
     current_hash: bytes
     leading_zeros: int
     target_number: int
+    epoch_time: int
 
 
 @dataclass
