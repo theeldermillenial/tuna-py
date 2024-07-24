@@ -163,4 +163,4 @@ cython_debug/
 
 CMakeFiles/
 Makefile
-cuda
+cuda/*.o

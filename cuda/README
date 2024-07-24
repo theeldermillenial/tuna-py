@@ -1,0 +1,19 @@
+# Cuda Fortuna
+
+This is a very WIP implementation of a cuda miner for fortuna.
+
+It does not integrate well with any of the existing typescript miners. I created a
+custom piece of Typescript code for testing that dumps the datum to a text file that
+is read by this miner, and used for hashing. When a datum is discovered, it dumps the
+nonce to a file that is read and submitted to the chain.
+
+Currently the leading zeros and difficulty is hard coded.
+
+Just to repeat, this is very WIP. This is probably not usable by most miners unless they
+can code.
+
+# Build
+
+I only built and tested with Cuda 12.2.
+
+To build, do `make gpu_miner`
