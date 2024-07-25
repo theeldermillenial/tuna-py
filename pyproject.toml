@@ -6,6 +6,9 @@ authors = ["ElderMillenial <eldermillenial@protonmail.com>"]
 readme = "README.md"
 packages = [{include = "tuna", from = "src"}]
 
+[tool.poetry.build]
+script = "build.py"
+
 [tool.poetry.dependencies]
 python = "^3.12"
 pycardano = "^0.11.1"
@@ -13,8 +16,10 @@ blockfrost-python = "^0.5.3"
 setuptools = "^71.1.0"
 python-dotenv = "^1.0.1"
 pydantic = "^2.8.2"
+setuptools-cpp = "^0.1.0"
+wheel = "^0.43.0"
 
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core", "wheel", "setuptools", "setuptools-cpp"]
 build-backend = "poetry.core.masonry.api"

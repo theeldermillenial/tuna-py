@@ -600,6 +600,20 @@ files = [
 ]
 
 [[package]]
+name = "pybind11"
+version = "2.13.1"
+description = "Seamless operability between C++11 and Python"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "pybind11-2.13.1-py3-none-any.whl", hash = "sha256:97881536abe0cd4260a9ccc5bf6d1cf3113318f08af1feb82d4b9f95e93f0aa4"},
+    {file = "pybind11-2.13.1.tar.gz", hash = "sha256:65be498b1cac516161add1508e65375674916bebf2570d057dc9c3c7bcbbc7b0"},
+]
+
+[package.extras]
+global = ["pybind11-global (==2.13.1)"]
+
+[[package]]
 name = "pycardano"
 version = "0.11.1"
 description = "A Cardano library in Python"
@@ -860,6 +874,21 @@ doc = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "pygments-
 test = ["build[virtualenv] (>=1.0.3)", "filelock (>=3.4.0)", "importlib-metadata", "ini2toml[lite] (>=0.14)", "jaraco.develop (>=7.21)", "jaraco.envs (>=2.2)", "jaraco.path (>=3.2.0)", "jaraco.test", "mypy (==1.11.*)", "packaging (>=23.2)", "pip (>=19.1)", "pyproject-hooks (!=1.1)", "pytest (>=6,!=8.1.*)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-home (>=0.5)", "pytest-mypy", "pytest-perf", "pytest-ruff (<0.4)", "pytest-ruff (>=0.2.1)", "pytest-ruff (>=0.3.2)", "pytest-subprocess", "pytest-timeout", "pytest-xdist (>=3)", "tomli", "tomli-w (>=1.0.0)", "virtualenv (>=13.0.0)", "wheel"]
 
 [[package]]
+name = "setuptools-cpp"
+version = "0.1.0"
+description = "Simplified packaging for pybind11-based C++ extensions"
+optional = false
+python-versions = ">=3.6,<4.0"
+files = [
+    {file = "setuptools_cpp-0.1.0-py3-none-any.whl", hash = "sha256:cd8179c038a12dbf2914999928f193f54d4713fd11715efdc5d6f450f663c8bd"},
+    {file = "setuptools_cpp-0.1.0.tar.gz", hash = "sha256:4fd5e08603237578d06d28efd592d9847b523ede3e502f660be44b1e6254674d"},
+]
+
+[package.dependencies]
+pybind11 = "*"
+setuptools = "*"
+
+[[package]]
 name = "six"
 version = "1.16.0"
 description = "Python 2 and 3 compatibility utilities"
@@ -932,7 +961,21 @@ docs = ["Sphinx (>=6.0)", "myst-parser (>=2.0.0)", "sphinx-rtd-theme (>=1.1.0)"]
 optional = ["python-socks", "wsaccel"]
 test = ["websockets"]
 
+[[package]]
+name = "wheel"
+version = "0.43.0"
+description = "A built-package format for Python"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "wheel-0.43.0-py3-none-any.whl", hash = "sha256:55c570405f142630c6b9f72fe09d9b67cf1477fcf543ae5b8dcb1f5b7377da81"},
+    {file = "wheel-0.43.0.tar.gz", hash = "sha256:465ef92c69fa5c5da2d1cf8ac40559a8c940886afcef87dcf14b9470862f1d85"},
+]
+
+[package.extras]
+test = ["pytest (>=6.0.0)", "setuptools (>=65)"]
+
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "35daa63424ecbf5b8d47adc3dc65a7b69fdd591ffa19a75a6ed5e16d3aa8b179"
+content-hash = "4c09ea506282c29da1b9cb86d7f5fd33bf44194ad5332b7736470705486c3b0c"

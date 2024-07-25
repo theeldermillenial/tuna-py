@@ -113,32 +113,3 @@ with connection as conn:
             logger.info(f"Submitting nonce: {target_view[window].hex()}, hash={hsh.hex()}")
             conn.submit_nonce(target_view[window].hex())
             submit_count += 1
-
-# while True:
-#     start = time.time()
-#     block = latest_block()
-#     target = block.target()
-#     target_bytes = bytearray(target.to_cbor())
-#     target_view = memoryview(target_bytes)
-
-#     hsh = get_hash(target_bytes)
-
-#     start = time.time()
-#     zero = int.to_bytes(0)
-#     count = 0
-#     while not all(["0" == h for h in hsh[:3].hex()]):
-#         try:
-#             target_view[4:8] = (int.from_bytes(target_view[4:8]) + 1).to_bytes(4)
-#         except OverflowError:
-#             print(target.nonce)
-#             raise
-#         hsh = get_hash(target_bytes)
-#         count += 1
-
-#     print(hsh.hex())
-#     print(int.from_bytes(target_view[4:8]))
-#     print(count)
-#     print(f"{count/(time.time() - start):.2f}h/s")
-#     print(time.time() - start)
-#     print(TargetState.from_cbor(bytes(target_bytes)))
-#     break

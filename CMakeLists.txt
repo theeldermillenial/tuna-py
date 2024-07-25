@@ -27,7 +27,7 @@ list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cuda")
 
 # Prevent from build in source tree
-include(preventBuildInSource)
+# include(preventBuildInSource)
 
 # Init build type: Release, Debug, ...
 include(initBuildType)
@@ -66,7 +66,7 @@ include(protect_pthread_flag)
 # build some Cuda library
 #-------------------------------------------------------------------#
 
-add_subdirectory(cuda)
+add_subdirectory(src/tuna/cuda)
 
 #-------------------------------------------------------------------#
 # Configuration summary
