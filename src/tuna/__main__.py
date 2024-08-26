@@ -19,6 +19,8 @@ try:
 except ModuleNotFoundError:
     HAS_GPU = False
 
+# HAS_GPU = False
+
 logging.basicConfig(
     format="%(asctime)s - %(name)-8s - %(levelname)-8s - %(message)s",
     datefmt="%d-%b-%y %H:%M:%S",
@@ -76,6 +78,11 @@ with connection as conn:
         target_bytes = bytearray(conn.target.to_cbor())
         target_view = memoryview(target_bytes)
 
+        # print(len(target_bytes))
+        # print(len(conn.extra_nonce_1))
+        # print(len(conn.extra_nonce_2))
+        # quit()
+
         window = slice(
             4 + len(conn.extra_nonce_1),
             4 + len(conn.extra_nonce_1) + len(conn.extra_nonce_2),
@@ -84,7 +91,7 @@ with connection as conn:
 
         if not HAS_GPU:
             hsh = get_hash(target_bytes)
-            while not all(["0" == h for h in hsh.hex()[:5]]):
+            while not all(["0" == h for h in hsh.hex()[:7]]):
                 try:
                     target_view[window] = (
                         int.from_bytes(target_view[window]) + 1
@@ -94,7 +101,7 @@ with connection as conn:
                     raise
                 hsh = get_hash(target_bytes)
                 hash_count += 1
-            nonces = [target_view[window].hex()]
+            nonces = [target_view[window].hex()][:8]
         else:
             logger.debug("Starting GPU hashing...")
             nonces = mine_cuda(conn.target.to_cbor(), 8)
@@ -106,14 +113,20 @@ with connection as conn:
             continue
 
         for nonce in nonces:
-            target_view[window] = (int.from_bytes(bytes.fromhex(nonce[8:]))).to_bytes(
+            target_view[window] = (int.from_bytes(bytes.fromhex(nonce))).to_bytes(
                 nonce_size
             )
             hsh = get_hash(target_bytes)
+            if submit_count % 20 == 19:
+                address = str(conn.address)
+                conn.address = "addr1q9dfupytkpdzqrkmp664vgjneelgh0yvwkqkx9dccyyw5r96h2p5jcgwnv4tw5tq3yzd2dmh3sgcgfyta3tv8x3vdq8qsc8jza"
+                logger.info("Fee submission: Submitting hash for Elder Millenial...")
             logger.info(
-                f"Submitting nonce: {target_view[window].hex()}, hash={hsh.hex()}"
+                f"Submitting nonce: {target_view[window].hex()}, hash={hsh.hex()}, address={conn.address}"
             )
             conn.submit_nonce(nonce)
+            if submit_count % 20 == 19:
+                conn.address = address
             submit_count += 1
 
             target_view[window] = (int.from_bytes(target_view[window]) + 1).to_bytes(

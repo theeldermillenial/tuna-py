@@ -1,3 +1,5 @@
+// #define VERIFY_HASH		//Execute only 1 thread and verify manually
+
 #include <cstdio>
 #include <cstdlib>
 #include <stdbool.h>
@@ -19,14 +21,15 @@ extern "C" {
 #include <string>
 #include <vector>
 
+#ifndef VERIFY_HASH
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/complex.h>
 
 namespace py = pybind11;
+#endif
 
 
-// #define VERIFY_HASH		//Execute only 1 thread and verify manually
 //#define ITERATE_BLOCKS	//Don't define BDIMX and create a 65535x1 Grid
 
 /*
@@ -52,7 +55,7 @@ namespace py = pybind11;
 __global__ void kernel_sha256d(unsigned int *nr, void *debug);
 
 
-__constant__ unsigned char device_data[101];
+__constant__ unsigned char device_data[105];
 __constant__ unsigned char device_difficulty[16];
 __constant__ unsigned long device_msg_len;
 
@@ -197,6 +200,7 @@ unsigned char * get_file_data(char * fname, unsigned long * MSG_SIZE) {
 	fsize = ftell(f);
 	rewind(f);
 	*MSG_SIZE = fsize / 2;
+	fprintf(stdout, "MSG_SIZE: %i\n", *MSG_SIZE);
 
 	buffer = (unsigned char *)malloc((fsize+1)*sizeof(unsigned char));
 	// checkCudaErrors(cudaMallocManaged(&buffer, (fsize+1)*sizeof(char)));
@@ -338,7 +342,7 @@ int main(int argc, char **argv) {
 			Measure and launch the kernel and start mining
 		*/
 		//Copy constants to device
-		CUDA_SAFE_CALL(cudaMemcpyToSymbol(device_data, &data[0], 101));
+		CUDA_SAFE_CALL(cudaMemcpyToSymbol(device_data, &data[0], 105));
 		CUDA_SAFE_CALL(cudaMemcpyToSymbol(device_difficulty, &difficulty[0], 16));
 		CUDA_SAFE_CALL(cudaMemcpyToSymbol(device_msg_len, &MSG_SIZE, 4));
 
@@ -631,13 +635,13 @@ __device__ void cuda_sha256_init(SHA256_RX *ctx) {
 }
 
 __device__ void cuda_sha256_first_update(SHA256_RX *ctx) {
-	for (int i = 0; i < 26; ++i) {
+	for (int i = 0; i < 27; ++i) {
 		ctx->data.word[i] = ENDIAN_SWAP_32(ctx->data.word[i]);
 	}							
 	cuda_sha256_transform(ctx);
 	ctx->bitlen = 512;
-	ctx->datalen = 37;
-	for (int i = 16; i < 26; ++i) {
+	ctx->datalen = 41;
+	for (int i = 16; i < 27; ++i) {
 		ctx->data.word[i-16] = ctx->data.word[i];
 	}
 }
@@ -645,11 +649,11 @@ __device__ void cuda_sha256_first_update(SHA256_RX *ctx) {
 __device__ void cuda_sha256_first_pad(SHA256_RX *ctx) {
 	WORD i;
 
-	ctx->data.byte[38] = 0x80;
-	ctx->data.byte[37] = 0;
-	ctx->data.byte[36] = 0;
+	ctx->data.byte[42] = 0x80;
+	ctx->data.byte[41] = 0;
+	ctx->data.byte[40] = 0;
 
-	i = 40;
+	i = 44;
 
 	while (i < 60)
 		ctx->data.byte[i++] = 0x00;
@@ -712,7 +716,7 @@ __global__ void kernel_sha256d(unsigned int *nonce, void *debug) {
 		}
 		shared_k[i] = k[i];
 		shared_data.byte[i] = device_data[i];
-	} else if (i < 101)
+	} else if (i < 105)
 	{
 		shared_data.byte[i] = device_data[i];
 	}
@@ -731,7 +735,7 @@ __global__ void kernel_sha256d(unsigned int *nonce, void *debug) {
 		shared_k[t] = k[t];
 		shared_data.byte[t] = device_data[t];
 	} 
-	for (int t = 64; t < 101; t++)
+	for (int t = 64; t < 105; t++)
 	{
 		shared_data.byte[t] = device_data[t];
 	}
@@ -762,7 +766,7 @@ __global__ void kernel_sha256d(unsigned int *nonce, void *debug) {
 		ctx.data.word[2] = ctx.nonce[1];
 		ctx.data.word[3] = ctx.nonce[2];
 		ctx.data.word[4] = ctx.nonce[3];
-		for (i = 5 ; i < 26; ++i) {
+		for (i = 5 ; i < 27; ++i) {
 			ctx.data.word[i] = shared_data.word[i];
 		}
 			#ifdef VERIFY_HASH
@@ -800,11 +804,6 @@ __global__ void kernel_sha256d(unsigned int *nonce, void *debug) {
 				cuPrintf("%.8x ", ENDIAN_SWAP_32(ctx.state[i]));
 			}
 			cuPrintf("\n");
-			cuPrintf("Pad: ");
-			for(int i=0; i<64; i++) {
-				cuPrintf("%.2x ", ctx.data.byte[i]);
-			}
-			cuPrintf("\n");
 			#endif
 			
 		// First value update
@@ -816,16 +815,22 @@ __global__ void kernel_sha256d(unsigned int *nonce, void *debug) {
 			}
 			cuPrintf("\n");
 			cuPrintf("Pad: ");
-			for(int i=0; i<64; i++) {
-				cuPrintf("%.2x ", ctx.data.byte[i]);
+			for(int i=0; i<16; i++) {
+				for (int j=(i+1)*4 - 1; j>=i*4; j--) {
+					cuPrintf("%.2x ", ctx.data.byte[j]);
+					// cuPrintf("%i ", j);
+				}
 			}
 			cuPrintf("\n");
 			#endif
 		cuda_sha256_first_pad(&ctx);
 			#ifdef VERIFY_HASH
 			cuPrintf("Pad: ");
-			for(int i=0; i<64; i++) {
-				cuPrintf("%.2x ", ctx.data.byte[i]);
+			for(int i=0; i<16; i++) {
+				for (int j=(i+1)*4 - 1; j>=i*4; j--) {
+					cuPrintf("%.2x ", ctx.data.byte[j]);
+					// cuPrintf("%i ", j);
+				}
 			}
 			cuPrintf("\n");
 			#endif
@@ -913,6 +918,7 @@ __global__ void kernel_sha256d(unsigned int *nonce, void *debug) {
 	}
 }
 
+#ifndef VERIFY_HASH
 std::vector<std::string> mine_cuda(py::bytes datum, unsigned int zeros) {
 	const std::string data(datum);
 	unsigned long MSG_SIZE = data.length();
@@ -945,7 +951,7 @@ std::vector<std::string> mine_cuda(py::bytes datum, unsigned int zeros) {
 	unsigned char * difficulty = set_tuna_difficulty(65535, zeros);
 
 	//Send data to device
-	CUDA_SAFE_CALL(cudaMemcpyToSymbol(device_data, &data[0], 101));
+	CUDA_SAFE_CALL(cudaMemcpyToSymbol(device_data, &data[0], 105));
 	CUDA_SAFE_CALL(cudaMemcpyToSymbol(device_difficulty, &difficulty[0], 16));
 	CUDA_SAFE_CALL(cudaMemcpyToSymbol(device_msg_len, &MSG_SIZE, 4));
 
@@ -984,3 +990,4 @@ PYBIND11_MODULE(gpu_library, m) {
         Mine using cuda.
     )pbdoc");
 }
+#endif

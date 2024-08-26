@@ -32,7 +32,7 @@ typedef unsigned int WORD;	// 32-bit word, change to "long" for 16-bit machines
 
 typedef struct
 {
-	BYTE data[101];
+	BYTE data[105];
 	WORD datalen;
 	unsigned long long bitlen;
 	WORD state[8];
@@ -41,8 +41,8 @@ typedef struct
 
 typedef union
 {
-	BYTE byte[104];
-	WORD word[26];
+	BYTE byte[108];
+	WORD word[27];
 } DATA;
 
 typedef union
