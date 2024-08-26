@@ -33,7 +33,7 @@ connection = Stratum(
     address=ADDRESS.encode(),
     password=STRATUM_PASSWORD,
     host=STRATUM_HOST,
-    workers=STRATUM_WORKER,
+    worker=STRATUM_WORKER,
     port=STRATUM_PORT,
 )
 
