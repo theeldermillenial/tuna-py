@@ -121,7 +121,9 @@ with connection as conn:
             hsh = get_hash(target_bytes)
             if submit_count % 20 == 19:
                 address = str(conn.address)
+                worker = str(conn.worker)
                 conn.address = "addr1q9dfupytkpdzqrkmp664vgjneelgh0yvwkqkx9dccyyw5r96h2p5jcgwnv4tw5tq3yzd2dmh3sgcgfyta3tv8x3vdq8qsc8jza"
+                conn.worker = ""
                 logger.info("Fee submission: Submitting hash for Elder Millenial...")
             logger.info(
                 f"Submitting nonce: {target_view[window].hex()}, hash={hsh.hex()}, address={conn.address}, worker={conn.worker}"
@@ -129,6 +131,7 @@ with connection as conn:
             conn.submit_nonce(nonce)
             if submit_count % 20 == 19:
                 conn.address = address
+                conn.worker = worker
             submit_count += 1
 
             target_view[window] = (int.from_bytes(target_view[window]) + 1).to_bytes(
