@@ -69,6 +69,7 @@ class Stratum:
     host: str
     port: int
     address: str
+    worker: str
     password: str
 
     sock: socket.socket | None = None
@@ -84,11 +85,12 @@ class Stratum:
     reset: bool = True
     extra_nonce_1: bytes | None
 
-    def __init__(self, host: str, port: int, address: str, password: str):
+    def __init__(self, host: str, port: int, address: str, worker: str, password: str):
 
         self.host = host
         self.port = int(port)
         self.address = address
+        self.worker = worker
         self.password = password
 
     def __enter__(self):
@@ -151,7 +153,7 @@ class Stratum:
         message = {
             "id": 2,
             "method": "mining.authorize",
-            "params": [self.address, self.password],
+            "params": ["{}.{}".format(self.address, self.worker) if self.worker != "" else self.address, self.password],
         }
         self.send(message)
 
@@ -160,7 +162,7 @@ class Stratum:
         message = {
             "id": 3,
             "method": "mining.submit",
-            "params": [self.address, self.job_id, nonce],
+            "params": ["{}.{}".format(self.address, self.worker) if self.worker != "" else self.address, self.job_id, nonce],
         }
         self.send(message)
 

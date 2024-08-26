@@ -35,6 +35,7 @@ elif os.environ.get("ADDRESS", None) is not None:
 
 STRATUM_PASSWORD = os.environ["STRATUM_PASSWORD"]
 STRATUM_HOST = os.environ["STRATUM_HOST"]
+STRATUM_WORKER = os.environ["STRATUM_WORKER"]
 STRATUM_PORT = int(os.environ["STRATUM_PORT"])
 
 CONFIG = {

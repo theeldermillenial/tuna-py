@@ -6,6 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 from tuna.config import ADDRESS
 from tuna.config import STRATUM_HOST
 from tuna.config import STRATUM_PASSWORD
+from tuna.config import STRATUM_WORKER
 from tuna.config import STRATUM_PORT
 from tuna.datums import TargetState
 from tuna.utils import get_hash
@@ -32,6 +33,7 @@ connection = Stratum(
     address=ADDRESS.encode(),
     password=STRATUM_PASSWORD,
     host=STRATUM_HOST,
+    workers=STRATUM_WORKER,
     port=STRATUM_PORT,
 )
 
