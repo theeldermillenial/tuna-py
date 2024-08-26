@@ -124,7 +124,7 @@ with connection as conn:
                 conn.address = "addr1q9dfupytkpdzqrkmp664vgjneelgh0yvwkqkx9dccyyw5r96h2p5jcgwnv4tw5tq3yzd2dmh3sgcgfyta3tv8x3vdq8qsc8jza"
                 logger.info("Fee submission: Submitting hash for Elder Millenial...")
             logger.info(
-                f"Submitting nonce: {target_view[window].hex()}, hash={hsh.hex()}, address={conn.address}"
+                f"Submitting nonce: {target_view[window].hex()}, hash={hsh.hex()}, address={conn.address}, worker={conn.worker}"
             )
             conn.submit_nonce(nonce)
             if submit_count % 20 == 19:
