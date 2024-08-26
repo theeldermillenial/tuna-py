@@ -15,7 +15,7 @@ from pycardano import Value
 
 load_dotenv()
 
-if os.environ.get("SEED", None) is not None:
+if os.environ.get("SEED", "") != "":
 
     wallet = HDWallet.from_mnemonic(os.environ["SEED"])
 
@@ -28,14 +28,14 @@ if os.environ.get("SEED", None) is not None:
     ADDRESS = Address(
         SPEND_KEY.to_verification_key().hash(),
         STAKE_KEY.to_verification_key().hash(),
-        network=Network.TESTNET
+        network=Network.TESTNET,
     )
-elif os.environ.get("STRATUM_ADDRESS", None) is not None:
-    ADDRESS = Address.decode(os.environ["STRATUM_ADDRESS"])
+elif os.environ.get("ADDRESS", None) is not None:
+    ADDRESS = Address.decode(os.environ["ADDRESS"])
 
 STRATUM_PASSWORD = os.environ["STRATUM_PASSWORD"]
 STRATUM_HOST = os.environ["STRATUM_HOST"]
-STRATUM_PORT = os.environ["STRATUM_PORT"]
+STRATUM_PORT = int(os.environ["STRATUM_PORT"])
 
 CONFIG = {
     "preview": {

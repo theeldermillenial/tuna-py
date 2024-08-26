@@ -39,7 +39,7 @@ namespace py = pybind11;
 #define BDIMX		256		//MAX = 512
 #define GDIMX		32		//MAX = 65535 = 2^16-1
 #define GDIMY		GDIMX
-#define NLOOPS		8192
+#define NLOOPS		4096
 #endif
 
 #ifdef VERIFY_HASH
@@ -909,32 +909,6 @@ __global__ void kernel_sha256d(unsigned int *nonce, void *debug) {
 					break;
 				}
 			}
-			
-			// nonce[0] = ctx.nonce[0];
-			// nonce[1] = ctx.nonce[1];
-			// nonce[2] = ctx.nonce[2];
-			// nonce[3] = ctx.nonce[3] + 1;
-			// break;
-			// cuPrintf("Final Hash: ");
-			// for(i=0; i<8; i++) {
-			// 	cuPrintf("%.8x ", ctx.state[i]);
-			// }
-			// cuPrintf("\n");
-			
-			// printf("Nonce: ");
-			// printf("%.8x ", nonce[0]);
-			// printf("%.8x ", nonce[1]);
-			// printf("%.8x ", nonce[2]);
-			// printf("%.8x ", nonce[3]);
-			// printf("\n");
-
-			
-			// cuPrintf("CTX Data: ");
-			// for(i=0; i<msglen; i++) {
-			// 	cuPrintf("%.2x", shared_data.byte[i]);
-			// }
-			// cuPrintf("\n");
-			// break;
 		}
 	}
 }
