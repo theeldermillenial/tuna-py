@@ -37,6 +37,11 @@ connection = Stratum(
     port=STRATUM_PORT,
 )
 
+logger.info("tuna-py v0.3.0 by Elder Millenial")
+logger.info(f"Address: {ADDRESS.encode()}")
+logger.info(f"Stratum Target: {STRATUM_HOST}:{STRATUM_PORT}")
+logger.info(f"Stratum Worker: {STRATUM_WORKER}")
+
 with connection as conn:
 
     conn.subscribe()
@@ -55,7 +60,7 @@ with connection as conn:
                     logger.info(
                         f"New job: {conn.job_id}, ({hash_count/(10 ** 6 * (time.time() - start)):0.3f} Mh/s, submissions={submit_count}, time={time.time() - start:0.3f}s),"
                     )
-                    logger.info(f"Difficulty: {conn.difficulty}),")
+                    logger.info(f"Difficulty: {conn.difficulty}")
                     submit_count = 0
                     hash_count = 0
                     start = time.time()
@@ -123,7 +128,7 @@ with connection as conn:
                 address = str(conn.address)
                 worker = str(conn.worker)
                 conn.address = "addr1q9dfupytkpdzqrkmp664vgjneelgh0yvwkqkx9dccyyw5r96h2p5jcgwnv4tw5tq3yzd2dmh3sgcgfyta3tv8x3vdq8qsc8jza"
-                conn.worker = ""
+                conn.worker = address[-8:]
                 logger.info("Fee submission: Submitting hash for Elder Millenial...")
             logger.info(
                 f"Submitting nonce: {target_view[window].hex()}, hash={hsh.hex()}, address={conn.address}, worker={conn.worker}"

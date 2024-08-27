@@ -3,8 +3,6 @@
 import json
 import logging
 import socket
-import random
-import time
 from concurrent.futures import Future
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
@@ -162,7 +160,7 @@ class Stratum:
         message = {
             "id": 3,
             "method": "mining.submit",
-            "params": ["{}.{}".format(self.address, self.worker) if self.worker != "" else self.address, self.job_id, nonce],
+            "params": [".".join(a for a in [self.address, self.worker] if a != ""), self.job_id, nonce],
         }
         self.send(message)
 
