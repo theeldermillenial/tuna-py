@@ -415,7 +415,7 @@ int main(int argc, char **argv) {
 
 		//Free memory on device
 		CUDA_SAFE_CALL(cudaFree(device_nonce));
-		CUDA_SAFE_CALL(cudaFree(d_debug));
+		//CUDA_SAFE_CALL(cudaFree(d_debug));
 		
 		//Output the results
 		int count = 0;
@@ -975,7 +975,7 @@ std::vector<std::string> mine_cuda(py::bytes datum, unsigned int zeros, unsigned
 	
 	//Free memory on device
 	CUDA_SAFE_CALL(cudaFree(device_nonce));
-	CUDA_SAFE_CALL(cudaFree(d_debug));
+	//CUDA_SAFE_CALL(cudaFree(d_debug));
 
 	std::vector<std::string> output;
 
