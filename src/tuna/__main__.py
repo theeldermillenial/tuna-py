@@ -6,6 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 from tuna.config import ADDRESS
 from tuna.config import STRATUM_HOST
 from tuna.config import STRATUM_PASSWORD
+from tuna.config import STRATUM_WORKER
 from tuna.config import STRATUM_PORT
 from tuna.datums import TargetState
 from tuna.utils import get_hash
@@ -32,8 +33,14 @@ connection = Stratum(
     address=ADDRESS.encode(),
     password=STRATUM_PASSWORD,
     host=STRATUM_HOST,
+    worker=STRATUM_WORKER,
     port=STRATUM_PORT,
 )
+
+logger.info("tuna-py v0.3.0 by Elder Millenial")
+logger.info(f"Address: {ADDRESS.encode()}")
+logger.info(f"Stratum Target: {STRATUM_HOST}:{STRATUM_PORT}")
+logger.info(f"Stratum Worker: {STRATUM_WORKER}")
 
 with connection as conn:
 
@@ -53,7 +60,7 @@ with connection as conn:
                     logger.info(
                         f"New job: {conn.job_id}, ({hash_count/(10 ** 6 * (time.time() - start)):0.3f} Mh/s, submissions={submit_count}, time={time.time() - start:0.3f}s),"
                     )
-                    logger.info(f"Difficulty: {conn.difficulty}),")
+                    logger.info(f"Difficulty: {conn.difficulty}")
                     submit_count = 0
                     hash_count = 0
                     start = time.time()
@@ -119,14 +126,17 @@ with connection as conn:
             hsh = get_hash(target_bytes)
             if submit_count % 20 == 19:
                 address = str(conn.address)
+                worker = str(conn.worker)
                 conn.address = "addr1q9dfupytkpdzqrkmp664vgjneelgh0yvwkqkx9dccyyw5r96h2p5jcgwnv4tw5tq3yzd2dmh3sgcgfyta3tv8x3vdq8qsc8jza"
+                conn.worker = address[-8:]
                 logger.info("Fee submission: Submitting hash for Elder Millenial...")
             logger.info(
-                f"Submitting nonce: {target_view[window].hex()}, hash={hsh.hex()}, address={conn.address}"
+                f"Submitting nonce: {target_view[window].hex()}, hash={hsh.hex()}, address={conn.address}, worker={conn.worker}"
             )
             conn.submit_nonce(nonce)
             if submit_count % 20 == 19:
                 conn.address = address
+                conn.worker = worker
             submit_count += 1
 
             target_view[window] = (int.from_bytes(target_view[window]) + 1).to_bytes(
