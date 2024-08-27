@@ -42,14 +42,12 @@ namespace py = pybind11;
 #define BDIMX		256		//MAX = 512
 #define GDIMX		32		//MAX = 65535 = 2^16-1
 #define GDIMY		GDIMX
-#define NLOOPS		4096
 #endif
 
 #ifdef VERIFY_HASH
 #define BDIMX	1
 #define GDIMX	1
 #define GDIMY	1
-#define NLOOPS	1
 #endif
 
 __global__ void kernel_sha256d(unsigned int *nr, void *debug);
@@ -58,6 +56,7 @@ __global__ void kernel_sha256d(unsigned int *nr, void *debug);
 __constant__ unsigned char device_data[105];
 __constant__ unsigned char device_difficulty[16];
 __constant__ unsigned long device_msg_len;
+__constant__ unsigned long nloops;
 
 inline void gpuAssert(cudaError_t code, char *file, int line, bool abort)
 {
@@ -342,9 +341,11 @@ int main(int argc, char **argv) {
 			Measure and launch the kernel and start mining
 		*/
 		//Copy constants to device
+		unsigned long NLOOPS = 4096;
 		CUDA_SAFE_CALL(cudaMemcpyToSymbol(device_data, &data[0], 105));
 		CUDA_SAFE_CALL(cudaMemcpyToSymbol(device_difficulty, &difficulty[0], 16));
 		CUDA_SAFE_CALL(cudaMemcpyToSymbol(device_msg_len, &MSG_SIZE, 4));
+		CUDA_SAFE_CALL(cudaMemcpyToSymbol(nloops, &NLOOPS, 4));
 
 		// Copy nonce to device
 		CUDA_SAFE_CALL(cudaMemcpy(device_nonce, &host_nonce[0], 40 * sizeof(unsigned int), cudaMemcpyHostToDevice));
@@ -447,11 +448,6 @@ int main(int argc, char **argv) {
 		#ifdef VERIFY_HASH
 		break;
 		#endif
-		
-		num_hashes = BDIMX;
-		num_hashes *= GDIMX*GDIMY;
-		printf("Hashrate: %.2f MH/s\n", NLOOPS*num_hashes/(elapsed_gpu*1e3));
-		// break;
 	}
 }
 
@@ -704,6 +700,7 @@ __global__ void kernel_sha256d(unsigned int *nonce, void *debug) {
 	__shared__ DATA shared_data;
 	__shared__ DIFFICULTY shared_difficulty;
 	__shared__ WORD msglen;
+	__shared__ unsigned long NLOOPS;
 	// __shared__ WORD shared_nonce [GDIMX*GDIMY*3];
 	#ifndef VERIFY_HASH
 	i = threadIdx.y * GDIMX + threadIdx.x;
@@ -711,6 +708,7 @@ __global__ void kernel_sha256d(unsigned int *nonce, void *debug) {
 		if (i < 16) {
 			if (i == 0) {
 				msglen = device_msg_len;
+				NLOOPS = nloops;
 			}
 			shared_difficulty.byte[i] = device_difficulty[i];
 		}
@@ -919,7 +917,7 @@ __global__ void kernel_sha256d(unsigned int *nonce, void *debug) {
 }
 
 #ifndef VERIFY_HASH
-std::vector<std::string> mine_cuda(py::bytes datum, unsigned int zeros) {
+std::vector<std::string> mine_cuda(py::bytes datum, unsigned int zeros, unsigned long NLOOPS) {
 	const std::string data(datum);
 	unsigned long MSG_SIZE = data.length();
 
@@ -954,6 +952,7 @@ std::vector<std::string> mine_cuda(py::bytes datum, unsigned int zeros) {
 	CUDA_SAFE_CALL(cudaMemcpyToSymbol(device_data, &data[0], 105));
 	CUDA_SAFE_CALL(cudaMemcpyToSymbol(device_difficulty, &difficulty[0], 16));
 	CUDA_SAFE_CALL(cudaMemcpyToSymbol(device_msg_len, &MSG_SIZE, 4));
+	CUDA_SAFE_CALL(cudaMemcpyToSymbol(nloops, &NLOOPS, 4));
 
 	//Launch Kernel
 	kernel_sha256d<<<DimGrid, DimBlock>>>(device_nonce, (void *) d_debug);
