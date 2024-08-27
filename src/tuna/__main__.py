@@ -44,7 +44,7 @@ def main(nloops: int = 4096, difficulty: int = 8):
     logger.info(f"Address: {ADDRESS.encode()}")
     logger.info(f"Stratum Target: {STRATUM_HOST}:{STRATUM_PORT}")
     logger.info(f"Stratum Worker: {STRATUM_WORKER}")
-    logger.info(f"Submit Difficulty: {STRATUM_WORKER}")
+    logger.info(f"Submit Difficulty: {difficulty}")
     logger.info(f"Number of CUDA Loops: {nloops}")
 
     with connection as conn:
