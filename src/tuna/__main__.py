@@ -40,7 +40,7 @@ MAGIC_HASH_NUMBER = 256 * 32 * 32
 
 def main(nloops: int = 4096, difficulty: int = 8):
 
-    logger.info("tuna-py v0.4.1 by Elder Millenial")
+    logger.info("tuna-py v0.4.2 by Elder Millenial")
     logger.info(f"Address: {ADDRESS.encode()}")
     logger.info(f"Stratum Target: {STRATUM_HOST}:{STRATUM_PORT}")
     logger.info(f"Stratum Worker: {STRATUM_WORKER}")

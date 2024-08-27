@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tuna"
-version = "0.4.1"
+version = "0.4.2"
 description = ""
 authors = ["ElderMillenial <eldermillenial@protonmail.com>"]
 readme = "README.md"
