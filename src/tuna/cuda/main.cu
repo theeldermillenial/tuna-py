@@ -955,7 +955,7 @@ std::vector<std::string> mine_cuda(py::bytes datum, unsigned int zeros, unsigned
 	host_nonce[3] = 0;									   // increment nonce
 
 	// Send nonce to device
-	// CUDA_SAFE_CALL(cudaMalloc((void **) &device_nonce, 40 * sizeof(unsigned int)));
+	CUDA_SAFE_CALL(cudaMalloc((void **) &device_nonce, 40 * sizeof(unsigned int)));
 	CUDA_SAFE_CALL(cudaMemcpy(device_nonce, &host_nonce[0], 40 * sizeof(unsigned int), cudaMemcpyHostToDevice));
 
 	//Decodes and stores the difficulty in a 16-byte array for convenience
