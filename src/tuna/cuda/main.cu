@@ -341,7 +341,11 @@ int main(int argc, char **argv) {
 			Measure and launch the kernel and start mining
 		*/
 		//Copy constants to device
+		#ifdef VERIFY_HASH
+		unsigned long NLOOPS = 1;
+		#else
 		unsigned long NLOOPS = 4096;
+		#endif
 		CUDA_SAFE_CALL(cudaMemcpyToSymbol(device_data, &data[0], 105));
 		CUDA_SAFE_CALL(cudaMemcpyToSymbol(device_difficulty, &difficulty[0], 16));
 		CUDA_SAFE_CALL(cudaMemcpyToSymbol(device_msg_len, &MSG_SIZE, 4));
@@ -636,7 +640,7 @@ __device__ void cuda_sha256_first_update(SHA256_RX *ctx) {
 	}							
 	cuda_sha256_transform(ctx);
 	ctx->bitlen = 512;
-	ctx->datalen = 41;
+	ctx->datalen = ctx->datalen - 64;
 	for (int i = 16; i < 27; ++i) {
 		ctx->data.word[i-16] = ctx->data.word[i];
 	}
@@ -645,11 +649,17 @@ __device__ void cuda_sha256_first_update(SHA256_RX *ctx) {
 __device__ void cuda_sha256_first_pad(SHA256_RX *ctx) {
 	WORD i;
 
-	ctx->data.byte[42] = 0x80;
-	ctx->data.byte[41] = 0;
-	ctx->data.byte[40] = 0;
+	i = 4 * (ctx->datalen / 4);
 
-	i = 44;
+	ctx->data.byte[i + 3 - (ctx->datalen % 4)] = 0x80;
+	for (int j = 2; i + j >= ctx->datalen; j--) {
+		ctx->data.byte[i + j - (ctx->datalen % 4)] = 0;
+	}
+	// ctx->data.byte[i + 2 - (ctx->datalen % 4)] = 0;
+	// ctx->data.byte[i + 1 - (ctx->datalen % 4)] = 0;
+	// ctx->data.byte[i - (ctx->datalen % 4)] = 0;
+
+	i += 4;
 
 	while (i < 60)
 		ctx->data.byte[i++] = 0x00;
@@ -743,6 +753,8 @@ __global__ void kernel_sha256d(unsigned int *nonce, void *debug) {
 	ctx.nonce[1] = 0;
 	ctx.nonce[2] = 0;
 	ctx.nonce[3] = 16777216;
+	
+	NLOOPS = nloops;
 	#endif
 
 	// Copy data to local registers
@@ -797,6 +809,7 @@ __global__ void kernel_sha256d(unsigned int *nonce, void *debug) {
 		cuda_sha256_init(&ctx);
 		ctx.datalen = msglen;
 			#ifdef VERIFY_HASH
+			cuPrintf("ctx.datalen: %i\n", 4*((ctx.datalen - 64)/4));
 			cuPrintf("1. init state: ");
 			for(int i=0; i<8; i++) {
 				cuPrintf("%.8x ", ENDIAN_SWAP_32(ctx.state[i]));
