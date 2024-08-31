@@ -113,7 +113,12 @@ The environment variables allow you to set your mining address and worker name j
 you would with the environment file. To set environment variables, use `-e KEY=VALUE`.
 For example, to set the address and worker name, you would do:
 
-`docker run --gpus 0 -e ADDRESS=addr1q9dfupytkpdzqrkmp664vgjneelgh0yvwkqkx9dccyyw5r96h2p5jcgwnv4tw5tq3yzd2dmh3sgcgfyta3tv8x3vdq8qsc8jza -e STRATUM_WORKER=HOME eldermillenial/tuna-py:0.5.0`
+```bash
+docker run --gpus 0 \
+   -e ADDRESS=addr1q9dfupytkpdzqrkmp664vgjneelgh0yvwkqkx9dccyyw5r96h2p5jcgwnv4tw5tq3yzd2dmh3sgcgfyta3tv8x3vdq8qsc8jza \
+   -e STRATUM_WORKER=HOME \
+   eldermillenial/tuna-py:0.5.0
+```
 
 For tool parameters like `--nloops`, you can just add them to the end of the docker
 command:
