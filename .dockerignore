@@ -1,0 +1,9 @@
+build
+.venv
+.lprof
+.mypy_cache
+dist
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+Dockerfile

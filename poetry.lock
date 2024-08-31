@@ -56,6 +56,17 @@ files = [
 requests = "*"
 
 [[package]]
+name = "bump2version"
+version = "1.0.1"
+description = "Version-bump your software with a single command!"
+optional = false
+python-versions = ">=3.5"
+files = [
+    {file = "bump2version-1.0.1-py2.py3-none-any.whl", hash = "sha256:37f927ea17cde7ae2d7baf832f8e80ce3777624554a653006c9144f8017fe410"},
+    {file = "bump2version-1.0.1.tar.gz", hash = "sha256:762cb2bfad61f4ec8e2bdf452c7c267416f8c70dd9ecb1653fd0bbb01fa936e6"},
+]
+
+[[package]]
 name = "cachetools"
 version = "5.4.0"
 description = "Extensible memoizing collections and decorators"
@@ -1083,13 +1094,13 @@ test = ["websockets"]
 
 [[package]]
 name = "wheel"
-version = "0.43.0"
+version = "0.42.0"
 description = "A built-package format for Python"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.7"
 files = [
-    {file = "wheel-0.43.0-py3-none-any.whl", hash = "sha256:55c570405f142630c6b9f72fe09d9b67cf1477fcf543ae5b8dcb1f5b7377da81"},
-    {file = "wheel-0.43.0.tar.gz", hash = "sha256:465ef92c69fa5c5da2d1cf8ac40559a8c940886afcef87dcf14b9470862f1d85"},
+    {file = "wheel-0.42.0-py3-none-any.whl", hash = "sha256:177f9c9b0d45c47873b619f5b650346d632cdc35fb5e4d25058e09c9e581433d"},
+    {file = "wheel-0.42.0.tar.gz", hash = "sha256:c45be39f7882c9d34243236f2d63cbd58039e360f85d0913425fbd7ceea617a8"},
 ]
 
 [package.extras]
@@ -1098,4 +1109,4 @@ test = ["pytest (>=6.0.0)", "setuptools (>=65)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "40d14b9a4f54e0543d50289dff523bd64c201385f6cdd90b61629a0421c1efd1"
+content-hash = "8ad2942361f2d3d4019d144fcad13ca8bbde71cc5e6b3f3f0635847d48727911"

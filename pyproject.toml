@@ -19,6 +19,7 @@ pydantic = "^2.8.2"
 setuptools-cpp = "^0.1.0"
 wheel = "^0.42.0"
 typer = "^0.12.5"
+bump2version = "^1.0.1"
 
 
 [build-system]

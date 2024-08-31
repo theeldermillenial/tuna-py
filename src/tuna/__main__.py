@@ -4,6 +4,7 @@ import time
 
 import typer
 
+from tuna import __version__
 from tuna.config import ADDRESS
 from tuna.config import STRATUM_HOST
 from tuna.config import STRATUM_PASSWORD
@@ -38,9 +39,10 @@ connection = Stratum(
 
 MAGIC_HASH_NUMBER = 256 * 32 * 32
 
+
 def main(nloops: int = 4096, difficulty: int = 8):
 
-    logger.info("tuna-py v0.4.1 by Elder Millenial")
+    logger.info(f"tuna-py {__version__} by Elder Millenial")
     logger.info(f"Address: {ADDRESS.encode()}")
     logger.info(f"Stratum Target: {STRATUM_HOST}:{STRATUM_PORT}")
     logger.info(f"Stratum Worker: {STRATUM_WORKER}")
@@ -56,7 +58,7 @@ def main(nloops: int = 4096, difficulty: int = 8):
         hash_count = 0
         start = time.time()
         while True:
-            
+
             while len(conn.messages) > 0:
                 message = conn.messages.pop(0)
                 if hasattr(message, "method"):
@@ -89,7 +91,7 @@ def main(nloops: int = 4096, difficulty: int = 8):
             if conn.target is None:
                 time.sleep(1)
                 continue
-            
+
             target_bytes = bytearray(conn.target.to_cbor())
             target_view = memoryview(target_bytes)
 
@@ -139,11 +141,12 @@ def main(nloops: int = 4096, difficulty: int = 8):
                 conn.submit_nonce(nonce)
                 submit_count += 1
 
-                target_view[window] = (int.from_bytes(target_view[window]) + 1).to_bytes(
-                    nonce_size
-                )
+                target_view[window] = (
+                    int.from_bytes(target_view[window]) + 1
+                ).to_bytes(nonce_size)
                 with conn.job_lock:
                     if job_id == conn.job_id:
                         conn.target = TargetState.from_cbor(target_bytes)
+
 
 typer.run(main)
